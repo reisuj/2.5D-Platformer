@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 
 public class Player : MonoBehaviour
@@ -20,6 +21,10 @@ public class Player : MonoBehaviour
 
     private UIManager _uiManager;
 
+    private int _lives = 3;
+
+    private Transform _spawnPoint;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -31,6 +36,11 @@ public class Player : MonoBehaviour
         {
             Debug.Log("UIManager is NULL!!");
         }
+
+        _uiManager.UpdateLivesDisplay(_lives);
+
+        _spawnPoint = this.transform;
+
     }
 
     // Update is called once per frame
@@ -61,6 +71,18 @@ public class Player : MonoBehaviour
         velocity.y = _yVelocity;
 
         _controller.Move(velocity * Time.deltaTime);
+
+        if (transform.position.y < -15.0f)
+        {
+            _lives--;
+            if (_lives < 1)
+            {
+                SceneManager.LoadScene(0);
+            }
+
+            transform.position = _spawnPoint.position;
+            _uiManager.UpdateLivesDisplay(_lives);
+        }
     }
 
     public void AddCoin()
