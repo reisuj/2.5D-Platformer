@@ -23,7 +23,8 @@ public class Player : MonoBehaviour
 
     private int _lives = 3;
 
-    private Transform _spawnPoint;
+    [SerializeField]
+    private GameObject _spawnPoint;
 
     // Start is called before the first frame update
     void Start()
@@ -38,9 +39,6 @@ public class Player : MonoBehaviour
         }
 
         _uiManager.UpdateLivesDisplay(_lives);
-
-        _spawnPoint = this.transform;
-
     }
 
     // Update is called once per frame
@@ -70,19 +68,7 @@ public class Player : MonoBehaviour
 
         velocity.y = _yVelocity;
 
-        _controller.Move(velocity * Time.deltaTime);
-
-        if (transform.position.y < -15.0f)
-        {
-            _lives--;
-            if (_lives < 1)
-            {
-                SceneManager.LoadScene(0);
-            }
-
-            transform.position = _spawnPoint.position;
-            _uiManager.UpdateLivesDisplay(_lives);
-        }
+        _controller.Move(velocity * Time.deltaTime);       
     }
 
     public void AddCoin()
@@ -90,5 +76,29 @@ public class Player : MonoBehaviour
         _coins++;
 
         _uiManager.UpdateCoinDisplay(_coins);
+    }
+
+    public void PlayerDied()
+    {
+        _controller.enabled = false;
+        _lives--;
+        _uiManager.UpdateLivesDisplay(_lives);
+
+        if (_lives < 1)
+        {
+            SceneManager.LoadScene(0);
+        }
+        else
+        {
+            this.transform.position = _spawnPoint.transform.position;
+        }
+
+        StartCoroutine(CCEnableRoutine(_controller));
+    }
+
+    IEnumerator CCEnableRoutine(CharacterController controller)
+    {
+        yield return new WaitForSeconds(0.1f);
+        controller.enabled = true;
     }
 }
