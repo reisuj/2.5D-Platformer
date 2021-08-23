@@ -1,21 +1,25 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Collectible : MonoBehaviour
+public class Coin : MonoBehaviour
 {
+    //OnTriggerEnter
+    //give the player a coin
+    //destroy this object
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.tag == "Player")
         {
             Player player = other.GetComponent<Player>();
 
             if (player != null)
             {
-                player.AddCoin();
+                player.AddCoins();
             }
 
             Destroy(this.gameObject);
         }
     }
+
 }

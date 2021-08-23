@@ -1,41 +1,34 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-
 public class Player : MonoBehaviour
 {
+    private CharacterController _controller;
     [SerializeField]
-    private float _gravity = 0.5f;
+    private float _speed = 5.0f;
     [SerializeField]
-    private float _playerSpeed = 5.0f;    
+    private float _gravity = 1.0f;
     [SerializeField]
-    private float _jumpHeight = 25.0f;
-    [SerializeField]
-    private int _coins;
+    private float _jumpHeight = 15.0f;
     private float _yVelocity;
     private bool _canDoubleJump = false;
-
-    private CharacterController _controller;
-
-    private UIManager _uiManager;
-
-    private int _lives = 3;
-
     [SerializeField]
-    private GameObject _spawnPoint;
+    private int _coins;
+    private UIManager _uiManager;
+    [SerializeField]
+    private int _lives = 3;
 
     // Start is called before the first frame update
     void Start()
     {
         _controller = GetComponent<CharacterController>();
-
         _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
 
         if (_uiManager == null)
         {
-            Debug.Log("UIManager is NULL!!");
+            Debug.LogError("The UI Manager is NULL."); 
         }
 
         _uiManager.UpdateLivesDisplay(_lives);
@@ -46,7 +39,7 @@ public class Player : MonoBehaviour
     {
         float horizontalInput = Input.GetAxis("Horizontal");
         Vector3 direction = new Vector3(horizontalInput, 0, 0);
-        Vector3 velocity = direction * _playerSpeed;
+        Vector3 velocity = direction * _speed;
 
         if (_controller.isGrounded == true)
         {
@@ -58,47 +51,39 @@ public class Player : MonoBehaviour
         }
         else
         {
-            if (Input.GetKeyDown(KeyCode.Space) && _canDoubleJump == true)
+            if (Input.GetKeyDown(KeyCode.Space))
             {
-                _yVelocity += _jumpHeight;
-                _canDoubleJump = false;
+                if (_canDoubleJump == true)
+                {
+                    _yVelocity += _jumpHeight;
+                    _canDoubleJump = false;
+                }
             }
+
             _yVelocity -= _gravity;
         }
 
         velocity.y = _yVelocity;
 
-        _controller.Move(velocity * Time.deltaTime);       
+        _controller.Move(velocity * Time.deltaTime);
     }
 
-    public void AddCoin()
+    public void AddCoins()
     {
         _coins++;
 
         _uiManager.UpdateCoinDisplay(_coins);
     }
 
-    public void PlayerDied()
+    public void Damage()
     {
-        _controller.enabled = false;
         _lives--;
+
         _uiManager.UpdateLivesDisplay(_lives);
 
         if (_lives < 1)
         {
             SceneManager.LoadScene(0);
         }
-        else
-        {
-            this.transform.position = _spawnPoint.transform.position;
-        }
-
-        StartCoroutine(CCEnableRoutine(_controller));
-    }
-
-    IEnumerator CCEnableRoutine(CharacterController controller)
-    {
-        yield return new WaitForSeconds(0.1f);
-        controller.enabled = true;
     }
 }
