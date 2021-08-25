@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,22 +7,19 @@ public class MovingPlatform : MonoBehaviour
     [SerializeField]
     private Transform _targetA, _targetB;
     [SerializeField]
-    private float _speed = 1.0f;
-
+    private float _speed = 3.0f;
     private bool _switching = false;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
+
+    // Update is called once per frame
     void FixedUpdate()
     {
         if (_switching == false)
         {
+
             transform.position = Vector3.MoveTowards(transform.position, _targetB.position, _speed * Time.deltaTime);
         }
-        else
+        else if (_switching == true)
         {
             transform.position = Vector3.MoveTowards(transform.position, _targetA.position, _speed * Time.deltaTime);
         }
@@ -31,16 +28,18 @@ public class MovingPlatform : MonoBehaviour
         {
             _switching = true;
         }
-
-        if (transform.position == _targetA.position)
+        else if (transform.position == _targetA.position)
         {
             _switching = false;
         }
     }
 
+    //collison detection with player
+    //if we collide with player
+    //take the player parent = this game object
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.tag == "Player")
         {
             other.transform.parent = this.transform;
         }
@@ -48,9 +47,13 @@ public class MovingPlatform : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.tag == "Player")
         {
             other.transform.parent = null;
         }
     }
+
+    //exit collision 
+    //check if the player exited
+    //take the player parent = null 
 }

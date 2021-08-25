@@ -1,24 +1,40 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class DeadZone : MonoBehaviour
 {
     [SerializeField]
-    private Transform _playerTransform;    
-
-    // Update is called once per frame
-    void Update()
-    {
-        transform.position = new Vector3(_playerTransform.position.x, transform.position.y, transform.position.z);
-    }
+    private GameObject _respawnPoint;
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.tag == "Player")
         {
-            other.GetComponent<Player>().PlayerDied();
-            Debug.Log("Player died");
+            Player player = other.GetComponent<Player>();
+
+            if (player != null)
+            {
+                player.Damage();
+            }
+
+            CharacterController cc = other.GetComponent<CharacterController>();
+
+            if (cc != null)
+            {
+                cc.enabled = false;
+            }
+
+            other.transform.position = _respawnPoint.transform.position;
+
+            StartCoroutine(CCEnableRoutine(cc));
         }
     }
+
+    IEnumerator CCEnableRoutine(CharacterController controller)
+    {
+        yield return new WaitForSeconds(0.5f);
+        controller.enabled = true;
+    }
+
 }
