@@ -13,16 +13,23 @@ public class ElevatorPanel : MonoBehaviour
     [SerializeField]
     private bool _elevatorCalled = false;
 
+
     private void OnTriggerStay(Collider other)
     {
         if (other.tag =="Player")
         {
             Player player = other.GetComponent<Player>();
 
-            if (Input.GetKey(KeyCode.E) && player.GetCoinAmount() >= _requiredCoins)
+            if (Input.GetKeyDown(KeyCode.E) && player.GetCoinAmount() >= _requiredCoins && _elevatorCalled == false)
             {
-                _callButton.material.color = Color.green;
                 _elevator.GetComponent<Elevator>().CallElevator();
+                _callButton.material.color = Color.green;
+                _elevatorCalled = true;                
+            }
+            else if (_elevatorCalled == true)
+            {
+                _callButton.material.color = Color.red;
+                _elevatorCalled = false;
             }
         }
     }
